@@ -2,13 +2,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.bugly.upgrade.demo">
 
-    <!--必须的权限配置-->
+    <!-- 必须的权限配置 -->
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.READ_LOGS" />
-    <!--保存资源到SD卡-->
+    <!-- 保存资源到SD卡 -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
@@ -26,15 +26,14 @@
             </intent-filter>
         </activity>
 
-        <!--测试Activity-->
-        <activity android:name=".OtherActivity"/>
+        <!-- 测试Activity -->
+        <activity android:name=".OtherActivity" />
 
-
-
-        <!--必须配置-->
+        <!-- 必须配置 -->
         <activity
             android:name="com.tencent.bugly.beta.ui.BetaActivity"
             android:theme="@android:style/Theme.Translucent" />
+        <activity android:name=".UpgradeActivity"></activity>
     </application>
 
 </manifest>

@@ -8,7 +8,7 @@ android {
         applicationId "com.bugly.upgrade.demo"
         minSdkVersion 14
         targetSdkVersion 23
-        versionCode 1
+        versionCode 3
         versionName "1.1"
         ndk {
             //设置支持的SO库架构
