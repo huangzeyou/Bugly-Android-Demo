@@ -1,36 +1,71 @@
 package com.bugly.upgrade.demo;
 
 import android.app.Application;
-import android.content.Context;
-import android.content.Intent;
 import android.os.Environment;
-import android.util.Log;
-import android.view.View;
-import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
+
+import com.bugly.upgrade.tool.BetaPatchListenerWapper;
+import com.bugly.upgrade.tool.UpgradeStateListenerWrapper;
+import com.bugly.upgrade.tool.UpgradeListenerWapper;
 
 import com.tencent.bugly.Bugly;
 import com.tencent.bugly.beta.Beta;
 import com.tencent.bugly.beta.UpgradeInfo;
-import com.tencent.bugly.beta.ui.UILifecycleListener;
 
+import com.tencent.bugly.beta.interfaces.BetaPatchListener;
+import com.tencent.bugly.beta.ui.UILifecycleListener;
 import com.tencent.bugly.beta.upgrade.UpgradeStateListener;
 import com.tencent.bugly.beta.upgrade.UpgradeListener;
 
 
-/**
- * Created by wenjiewu on 2016/5/23.
- */
-
 public class MyApplication extends Application {
+
 
     public static final String APP_ID = "91cb66a058"; // TODO 替换成bugly上注册的appid
     public static final String APP_CHANNEL = "DEBUG"; // TODO 自定义渠道
     private static final String TAG = "OnUILifecycleListener";
 
-    private void InitBuglyBeta()
-    {
+    private UpgradeStateListenerWrapper upgradeStateListenerWrapper = new UpgradeStateListenerWrapper();
+    private UpgradeListenerWapper upgradeListenerWapper = new UpgradeListenerWapper();
+    private BetaPatchListenerWapper betaPatchListenerWapper = new BetaPatchListenerWapper();
+
+
+    public void registUpgradeStateListener(UpgradeStateListener l) {
+        upgradeStateListenerWrapper.regist(l);
+    }
+
+    public void unregistUpgradeStateListener() {
+        upgradeStateListenerWrapper.unregist();
+    }
+
+    public void registUpgradeListener(UpgradeListener l) {
+        upgradeListenerWapper.regist(l);
+    }
+
+    public void unregistUpgradeListener() {
+        upgradeListenerWapper.unregist();
+    }
+
+    public void registBetaPatchListener(BetaPatchListener l) {
+        betaPatchListenerWapper.regist(l);
+    }
+
+    public void unregistBetaPatchListener() {
+        betaPatchListenerWapper.unregist();
+    }
+
+
+
+    private void InitBuglyBeta() {
+        /**** 热更新 配置*****/
+
+        // 设置是否自动下载补丁
+        Beta.canAutoDownloadPatch = true;
+        // 设置是否提示用户重启
+        Beta.canNotifyUserRestart = false;
+        // 设置是否自动合成补丁
+        Beta.canAutoPatch = true;
+
         /**** Beta高级设置*****/
         /**
          * true表示app启动自动初始化升级模块；
@@ -87,50 +122,16 @@ public class MyApplication extends Application {
 
 
         /* 设置更新状态回调接口 */
-        Beta.upgradeStateListener = new UpgradeStateListener() {
-            @Override
-            public void onUpgradeSuccess(boolean isManual) {
-                Toast.makeText(getApplicationContext(),"UPGRADE_SUCCESS",Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onUpgradeFailed(boolean isManual) {
-                Toast.makeText(getApplicationContext(),"UPGRADE_FAILED",Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onUpgrading(boolean isManual) {
-                Toast.makeText(getApplicationContext(),"UPGRADE_CHECKING",Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onUpgradeNoVersion(boolean isManual) {
-                Toast.makeText(getApplicationContext(),"UPGRADE_NO_VERSION",Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onDownloadCompleted(boolean isManual)
-            {
-                Toast.makeText(getApplicationContext(),"DOWNLOAD_COMPLETED",Toast.LENGTH_SHORT).show();
-            }
-        };
+        Beta.upgradeStateListener = upgradeStateListenerWrapper;
 
         /*在application中初始化时设置监听，监听策略的收取*/
-        Beta.upgradeListener = new UpgradeListener() {
-            @Override
-            public void onUpgrade(int ret,UpgradeInfo strategy, boolean isManual, boolean isSilence) {
-                if (strategy != null) {
-                    Intent i = new Intent();
-                    i.setClass(getApplicationContext(), UpgradeActivity.class);
-                    i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        Beta.upgradeListener = upgradeListenerWapper;
 
-                    startActivity(i);
-                    Toast.makeText(MyApplication.this, "有更新 ", Toast.LENGTH_LONG).show();
-                } else {
-                    Toast.makeText(MyApplication.this, "没有更新", Toast.LENGTH_LONG).show();
-                }
-            }
-        };
+
+        /**
+         * 补丁回调接口，可以监听补丁接收、下载、合成的回调
+         */
+        Beta.betaPatchListener = betaPatchListenerWapper;
 
 
         /**
@@ -155,7 +156,6 @@ public class MyApplication extends Application {
          *  详见layout/tips_dialog.xml
          */
         Beta.tipsDialogLayoutId = R.layout.tips_dialog;
-
         /**
          *  如果想监听升级对话框的生命周期事件，可以通过设置OnUILifecycleListener接口
          *  回调参数解释：
@@ -163,7 +163,7 @@ public class MyApplication extends Application {
          *  view - 升级对话框的根布局视图，可通过这个对象查找指定view控件
          *  upgradeInfo - 升级信息
          */
-        Beta.upgradeDialogLifecycleListener = new UILifecycleListener<UpgradeInfo>() {
+/*        Beta.upgradeDialogLifecycleListener = new UILifecycleListener<UpgradeInfo>() {
             @Override
             public void onCreate(Context context, View view, UpgradeInfo upgradeInfo) {
                 Log.d(TAG, "onCreate");
@@ -212,7 +212,7 @@ public class MyApplication extends Application {
             public void onDestroy(Context context, View view, UpgradeInfo upgradeInfo) {
                 Log.d(TAG, "onDestory");
             }
-        };
+        };*/
 
         /**
          * 已经接入Bugly用户改用上面的初始化方法,不影响原有的crash上报功能;
@@ -242,7 +242,8 @@ public class MyApplication extends Application {
     public void onCreate() {
         super.onCreate();
         InitBuglyBeta();
-
-        Beta.checkUpgrade();
     }
+
+
+
 }
