@@ -5,6 +5,7 @@ import android.content.pm.ActivityInfo;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
@@ -22,6 +23,7 @@ import com.tencent.bugly.beta.upgrade.UpgradeListener;
 import com.tencent.bugly.beta.upgrade.UpgradeStateListener;
 
 import java.util.Locale;
+import java.util.logging.Logger;
 
 public class UpgradeActivity extends AppCompatActivity {
 
@@ -99,10 +101,12 @@ public class UpgradeActivity extends AppCompatActivity {
 
             @Override
             public void onDownloadReceived(long savedLength, long totalLength) {
-                Toast.makeText(getApplicationContext(), String.format(Locale.getDefault(),
+                /*Toast.makeText(getApplicationContext(), String.format(Locale.getDefault(),
                         "%s %d%%",
                         Beta.strNotificationDownloading,
-                        (int) (totalLength == 0 ? 0 : savedLength * 100 / totalLength)), Toast.LENGTH_SHORT).show();
+                        (int) (totalLength == 0 ? 0 : savedLength * 100 / totalLength)), Toast.LENGTH_SHORT).show();*/
+
+                Log.d("hehe","hehe");
             }
 
             @Override
@@ -132,8 +136,6 @@ public class UpgradeActivity extends AppCompatActivity {
             @Override
             public void onUpgrade(int ret,UpgradeInfo strategy, boolean isManual, boolean isSilence) {
                 if (strategy != null) {
-
-
 
                     /*注册下载监听，监听下载事件*/
                     // 必须在 接收到策略之后再注册 Downloadlistener.
@@ -177,9 +179,9 @@ public class UpgradeActivity extends AppCompatActivity {
 
                         }
                     });
-//                    Toast.makeText(MyApplication.this, "有更新 ", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "有更新 ", Toast.LENGTH_LONG).show();
                 } else {
-//                    Toast.makeText(MyApplication.this, "没有更新", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "没有更新", Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -188,8 +190,8 @@ public class UpgradeActivity extends AppCompatActivity {
         start.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DownloadTask task = Beta.startDownload();
-                updateBtn(task);
+                Beta.startDownload();
+//                updateBtn(task);
 //                if (task.getStatus() == DownloadTask.DOWNLOADING) {
 //                    finish();
 //                }
@@ -264,6 +266,8 @@ public class UpgradeActivity extends AppCompatActivity {
         progressTextView.setText(info);
         bar.setProgress( progress );
     }
+
+
 
     public <T extends View> T getView(int id) {
         return (T) findViewById(id);

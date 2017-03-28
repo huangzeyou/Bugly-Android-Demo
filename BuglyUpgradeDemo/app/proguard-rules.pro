@@ -16,9 +16,9 @@
 #   public *;
 #}
 
-# Bugly»ìÏı¹æÔò
+# Buglyæ··æ·†è§„åˆ™
 -dontwarn com.tencent.bugly.**
 -keep public class com.tencent.bugly.**{*;}
 
-# ±ÜÃâÓ°ÏìÉı¼¶¹¦ÄÜ£¬ĞèÒªkeep×¡support°üµÄÀà
+# é¿å…å½±å“å‡çº§åŠŸèƒ½ï¼Œéœ€è¦keepä½supportåŒ…çš„ç±»
 -keep class android.support.**{*;}
