@@ -8,8 +8,8 @@ android {
         applicationId "com.bugly.upgrade.demo"
         minSdkVersion 14
         targetSdkVersion 23
-        versionCode 5
-        versionName "1.1.5"
+        versionCode 12
+        versionName "1.1.12"
         ndk {
             //设置支持的SO库架构
             //abiFilters 'armeabi' , 'x86'//, 'armeabi-v7a', 'x86_64', 'arm64-v8a'

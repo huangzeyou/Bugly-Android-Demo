@@ -8,8 +8,8 @@ buildscript {
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
-        // Ö»ĞèÅäÖÃtinker-support²å¼şÒÀÀµ£¬ÎŞĞèÔÙÒÀÀµtinker²å¼ş
-        classpath 'com.tencent.bugly:tinker-support:1.0.4'
+        // Ö»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½tinker-supportï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½tinkerï¿½ï¿½ï¿½
+        classpath 'com.tencent.bugly:tinker-support:latest.release'
     }
 }
 allprojects {

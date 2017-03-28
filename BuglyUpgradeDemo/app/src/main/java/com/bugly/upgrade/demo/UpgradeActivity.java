@@ -25,12 +25,14 @@ import com.tencent.bugly.beta.upgrade.UpgradeStateListener;
 import java.util.Locale;
 import java.util.logging.Logger;
 
+
+
+
 public class UpgradeActivity extends AppCompatActivity {
 
     private TextView progressTextView;
     private TextView version;
     private TextView content;
-
 
     private Button start;
     private ProgressBar bar;
@@ -56,7 +58,7 @@ public class UpgradeActivity extends AppCompatActivity {
             @Override
             public void onUpgradeSuccess(boolean isManual) {
                 Toast.makeText(getApplicationContext(),"UPGRADE_SUCCESS",Toast.LENGTH_SHORT).show();
-                progressTextView.setText("检测到有新版本");
+                progressTextView.setText("检测到有新版本.");
                 updateBtn(Beta.getStrategyTask());
             }
 
@@ -64,27 +66,27 @@ public class UpgradeActivity extends AppCompatActivity {
             public void onUpgradeFailed(boolean isManual) {
                 // 检测更新失败
                 Toast.makeText(getApplicationContext(),"UPGRADE_FAILED",Toast.LENGTH_SHORT).show();
-                progressTextView.setText("更新失败");
+                progressTextView.setText("更新失败.");
             }
 
             @Override
             public void onUpgrading(boolean isManual) {
                 // 正在检测更新
                 Toast.makeText(getApplicationContext(),"UPGRADE_CHECKING",Toast.LENGTH_SHORT).show();
-                progressTextView.setText("正在检测更新");
+                progressTextView.setText("正在检测更新.");
             }
 
             @Override
             public void onUpgradeNoVersion(boolean isManual) {
                 Toast.makeText(getApplicationContext(),"UPGRADE_NO_VERSION",Toast.LENGTH_SHORT).show();
-                progressTextView.setText("已经是最新版本");
+                progressTextView.setText("已经是最新版本.");
             }
 
             @Override
             public void onDownloadCompleted(boolean isManual)
             {
                 Toast.makeText(getApplicationContext(),"DOWNLOAD_COMPLETED",Toast.LENGTH_SHORT).show();
-                progressTextView.setText("下载完成");
+                progressTextView.setText("下载完成.");
             }
         });
 
@@ -101,12 +103,7 @@ public class UpgradeActivity extends AppCompatActivity {
 
             @Override
             public void onDownloadReceived(long savedLength, long totalLength) {
-                /*Toast.makeText(getApplicationContext(), String.format(Locale.getDefault(),
-                        "%s %d%%",
-                        Beta.strNotificationDownloading,
-                        (int) (totalLength == 0 ? 0 : savedLength * 100 / totalLength)), Toast.LENGTH_SHORT).show();*/
-
-                Log.d("hehe","hehe");
+                updateProgress(savedLength, totalLength);
             }
 
             @Override
@@ -258,6 +255,12 @@ public class UpgradeActivity extends AppCompatActivity {
         long saved = task.getSavedLength();
         long total = task.getTotalLength();
 
+        updateProgress(saved, total);
+    }
+
+
+    private void updateProgress(long saved, long total)
+    {
         int progress = (int) ((double) saved * 100 / total);
         StringBuilder info = new StringBuilder();
         info.append( Integer.toString(progress)).append( "%" );
@@ -266,7 +269,6 @@ public class UpgradeActivity extends AppCompatActivity {
         progressTextView.setText(info);
         bar.setProgress( progress );
     }
-
 
 
     public <T extends View> T getView(int id) {
