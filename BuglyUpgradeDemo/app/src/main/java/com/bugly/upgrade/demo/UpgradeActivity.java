@@ -1,9 +1,8 @@
 package com.bugly.upgrade.demo;
 
-import android.app.Activity;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.net.Uri;
+import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
@@ -23,23 +22,30 @@ import com.tencent.bugly.beta.upgrade.UpgradeStateListener;
 
 import java.util.Locale;
 
-public class UpgradeActivity extends Activity {
+public class UpgradeActivity extends AppCompatActivity {
 
     private TextView progressTextView;
     private TextView version;
     private TextView content;
-    private Button cancel;
+
+
     private Button start;
     private ProgressBar bar;
-
-
-
 
     protected void onCreate(Bundle savedInstanceState) {
 
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
+
+        setContentView(R.layout.activity_upgrade);
+
+        progressTextView = getView(R.id.progressTextView);
+        version = getView(R.id.version);
+        content = getView(R.id.content);
+        start = getView(R.id.start);
+        bar = getView(R.id.progressBar);
+        bar.setMax(100);
 
         /* 设置更新状态回调接口 */
         MyApplication app = (MyApplication)getApplication();
@@ -48,6 +54,7 @@ public class UpgradeActivity extends Activity {
             public void onUpgradeSuccess(boolean isManual) {
                 Toast.makeText(getApplicationContext(),"UPGRADE_SUCCESS",Toast.LENGTH_SHORT).show();
                 progressTextView.setText("检测到有新版本");
+                updateBtn(Beta.getStrategyTask());
             }
 
             @Override
@@ -125,32 +132,54 @@ public class UpgradeActivity extends Activity {
             public void onUpgrade(int ret,UpgradeInfo strategy, boolean isManual, boolean isSilence) {
                 if (strategy != null) {
 
+                    /*注册下载监听，监听下载事件*/
+                    // 必须在 接收到策略之后再注册 Downloadlistener.
+                    Beta.registerDownloadListener(new DownloadListener() {
+                        @Override
+                        public void onReceive(DownloadTask task) {
+                            updateBtn(task);
+                            updateProgress(task);
+
+                        }
+
+                        @Override
+                        public void onCompleted(DownloadTask task) {
+                            updateBtn(task);
+                            start.setText("安装");
+
+                            start.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+
+                                    DownloadTask task = Beta.getStrategyTask();
+
+                                    Intent i = new Intent(Intent.ACTION_VIEW);
+                                    i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                                    i.setDataAndType(Uri.parse("file://" + task.getSaveFile().getAbsolutePath()),
+                                            "application/vnd.android.package-archive");
+                                    getApplicationContext().startActivity(i);
+
+                                    android.os.Process.killProcess(android.os.Process.myPid());
+
+                                }
+                            });
+
+                        }
+
+                        @Override
+                        public void onFailed(DownloadTask task, int code, String extMsg) {
+                            updateBtn(task);
+                            progressTextView.setText("failed");
+
+                        }
+                    });
 //                    Toast.makeText(MyApplication.this, "有更新 ", Toast.LENGTH_LONG).show();
                 } else {
 //                    Toast.makeText(MyApplication.this, "没有更新", Toast.LENGTH_LONG).show();
                 }
             }
         });
-
-
-
-        setContentView(R.layout.activity_upgrade);
-
-        progressTextView = getView(R.id.progressTextView);
-        version = getView(R.id.version);
-        content = getView(R.id.content);
-        cancel = getView(R.id.cancel);
-        start = getView(R.id.start);
-        bar = getView(R.id.progressBar);
-
-        bar.setMax(100);
-
-
-
-
-
-            /*获取下载任务，初始化界面信息*/
-//        updateBtn(Beta.getStrategyTask());
 
 
 
@@ -166,64 +195,11 @@ public class UpgradeActivity extends Activity {
             }
         });
 
-            /*为取消按钮设置监听*/
-        cancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Beta.cancelDownload();
-                finish();
-            }
-        });
 
-            /*注册下载监听，监听下载事件*/
-        Beta.registerDownloadListener(new DownloadListener() {
-            @Override
-            public void onReceive(DownloadTask task) {
-                updateBtn(task);
-                updateProgress(task);
 
-            }
 
-            @Override
-            public void onCompleted(DownloadTask task) {
-                updateBtn(task);
-                //updateProgress(task);
-                start.setText("安装");
-
-                start.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-
-                        DownloadTask task = Beta.getStrategyTask();
-
-                        Intent i = new Intent(Intent.ACTION_VIEW);
-                        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-                        i.setDataAndType(Uri.parse("file://" + task.getSaveFile().getAbsolutePath()),
-                               "application/vnd.android.package-archive");
-                        getApplicationContext().startActivity(i);
-
-                        android.os.Process.killProcess(android.os.Process.myPid());
-
-                    }
-                });
-
-            }
-
-            @Override
-            public void onFailed(DownloadTask task, int code, String extMsg) {
-                updateBtn(task);
-                progressTextView.setText("failed");
-
-            }
-        });
 
     }
-
-
-    private void setProgress(){}
-
-
 
     @Override
     protected void onResume() {
@@ -295,7 +271,4 @@ public class UpgradeActivity extends Activity {
     public <T extends View> T getView(int id) {
         return (T) findViewById(id);
     }
-
-
-
 }

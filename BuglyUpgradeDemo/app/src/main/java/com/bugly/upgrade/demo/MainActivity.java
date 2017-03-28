@@ -1,6 +1,5 @@
 package com.bugly.upgrade.demo;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -13,26 +12,27 @@ import android.widget.TextView;
 
 import com.tencent.bugly.beta.Beta;
 import com.tencent.bugly.beta.UpgradeInfo;
-import com.tencent.bugly.beta.interfaces.BetaPatchListener;
-import com.tencent.bugly.beta.upgrade.UpgradeStateListener;
 
-import java.util.Locale;
+
 
 
 /**
  * init方法自动检查更新，checkUpdate方法手动检查更新
  * Created by wenjiewu on 2016/5/23.
  */
-public class MainActivity extends Activity
-{
+public class MainActivity extends AppCompatActivity {
+
+/*
     private Button btnCheckUpdate;
     private Button btnLoadUpgradeInfo;
     private TextView tvUpgradeInfo;
+*/
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+/*
         setContentView(R.layout.activity_main);
 
         btnCheckUpdate = (Button) findViewById(R.id.btnCheckUpdate);
@@ -51,34 +51,27 @@ public class MainActivity extends Activity
             public void onClick(View v) {
                 loadUpgradeInfo();
             }
-        });
-
+        });*/
 
 
         Intent i = new Intent();
         i.setClass(getApplicationContext(), UpgradeActivity.class);
-        i.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
         startActivity(i);
-
-        finish();
-
-        Beta.checkUpgrade();
-
     }
-
 
     @Override
     protected void onResume() {
         super.onResume();
-        loadUpgradeInfo();
+//        loadUpgradeInfo();
     }
 
-    private void loadUpgradeInfo() {
+/*    private void loadUpgradeInfo() {
         if (tvUpgradeInfo == null)
             return;
 
-        /***** 获取升级信息 *****/
+        // 获取升级信息
         UpgradeInfo upgradeInfo = Beta.getUpgradeInfo();
 
         if (upgradeInfo == null) {
@@ -102,10 +95,7 @@ public class MainActivity extends Activity
         info.append("弹窗类型（1:建议 2:强制 3:手工）: ").append(upgradeInfo.upgradeType);
 
         tvUpgradeInfo.setText(info);
-    }
-
-
-
+    }*/
 
 
 }

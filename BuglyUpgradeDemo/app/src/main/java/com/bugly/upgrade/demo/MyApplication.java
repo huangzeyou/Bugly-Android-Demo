@@ -12,11 +12,16 @@ import com.tencent.bugly.Bugly;
 import com.tencent.bugly.beta.Beta;
 import com.tencent.bugly.beta.UpgradeInfo;
 
-import com.tencent.bugly.beta.interfaces.BetaPatchListener;
 import com.tencent.bugly.beta.ui.UILifecycleListener;
+
 import com.tencent.bugly.beta.upgrade.UpgradeStateListener;
 import com.tencent.bugly.beta.upgrade.UpgradeListener;
+import com.tencent.bugly.beta.interfaces.BetaPatchListener;
 
+
+/**
+ * Created by wenjiewu on 2016/5/23.
+ */
 
 public class MyApplication extends Application {
 
@@ -33,7 +38,6 @@ public class MyApplication extends Application {
     public void registUpgradeStateListener(UpgradeStateListener l) {
         upgradeStateListenerWrapper.regist(l);
     }
-
     public void unregistUpgradeStateListener() {
         upgradeStateListenerWrapper.unregist();
     }
@@ -41,7 +45,6 @@ public class MyApplication extends Application {
     public void registUpgradeListener(UpgradeListener l) {
         upgradeListenerWapper.regist(l);
     }
-
     public void unregistUpgradeListener() {
         upgradeListenerWapper.unregist();
     }
@@ -49,23 +52,12 @@ public class MyApplication extends Application {
     public void registBetaPatchListener(BetaPatchListener l) {
         betaPatchListenerWapper.regist(l);
     }
-
     public void unregistBetaPatchListener() {
         betaPatchListenerWapper.unregist();
     }
 
-
-
-    private void InitBuglyBeta() {
-        /**** 热更新 配置*****/
-
-        // 设置是否自动下载补丁
-        Beta.canAutoDownloadPatch = true;
-        // 设置是否提示用户重启
-        Beta.canNotifyUserRestart = false;
-        // 设置是否自动合成补丁
-        Beta.canAutoPatch = true;
-
+    private void InitBuglyBeta()
+    {
         /**** Beta高级设置*****/
         /**
          * true表示app启动自动初始化升级模块；
@@ -79,7 +71,7 @@ public class MyApplication extends Application {
          * true表示初始化时自动检查升级
          * false表示不会自动检查升级，需要手动调用Beta.checkUpgrade()方法
          */
-        Beta.autoCheckUpgrade = false;
+        Beta.autoCheckUpgrade = true;
 
         /**
          * 设置升级周期为60s（默认检查周期为0s），60s内SDK不重复向后天请求策略
@@ -156,6 +148,7 @@ public class MyApplication extends Application {
          *  详见layout/tips_dialog.xml
          */
         Beta.tipsDialogLayoutId = R.layout.tips_dialog;
+
         /**
          *  如果想监听升级对话框的生命周期事件，可以通过设置OnUILifecycleListener接口
          *  回调参数解释：
@@ -223,7 +216,6 @@ public class MyApplication extends Application {
          */
         Bugly.init(getApplicationContext(), APP_ID, true);
 
-//        Beta.checkUpgrade();
         /**
          * 如果想自定义策略，按照如下方式设置
          */
@@ -242,8 +234,7 @@ public class MyApplication extends Application {
     public void onCreate() {
         super.onCreate();
         InitBuglyBeta();
+
+
     }
-
-
-
 }
