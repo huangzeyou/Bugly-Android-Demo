@@ -1,7 +1,9 @@
 package com.bugly.upgrade.demo;
 
 import android.app.Application;
+import android.content.Context;
 import android.os.Environment;
+import android.support.multidex.MultiDex;
 import android.widget.Toast;
 
 import com.bugly.upgrade.tool.BetaPatchListenerWapper;
@@ -10,7 +12,6 @@ import com.bugly.upgrade.tool.UpgradeListenerWapper;
 
 import com.tencent.bugly.Bugly;
 import com.tencent.bugly.beta.Beta;
-import com.tencent.bugly.beta.UpgradeInfo;
 
 import com.tencent.bugly.beta.ui.UILifecycleListener;
 
@@ -58,6 +59,16 @@ public class MyApplication extends Application {
 
     private void InitBuglyBeta()
     {
+
+        // 设置是否自动下载补丁
+        Beta.canAutoDownloadPatch = true;
+        // 设置是否提示用户重启
+        Beta.canNotifyUserRestart = false;
+        // 设置是否自动合成补丁
+        Beta.canAutoPatch = true;
+
+
+
         /**** Beta高级设置*****/
         /**
          * true表示app启动自动初始化升级模块；
@@ -72,6 +83,7 @@ public class MyApplication extends Application {
          * false表示不会自动检查升级，需要手动调用Beta.checkUpgrade()方法
          */
         Beta.autoCheckUpgrade = true;
+
 
         /**
          * 设置升级周期为60s（默认检查周期为0s），60s内SDK不重复向后天请求策略
@@ -120,9 +132,7 @@ public class MyApplication extends Application {
         Beta.upgradeListener = upgradeListenerWapper;
 
 
-        /**
-         * 补丁回调接口，可以监听补丁接收、下载、合成的回调
-         */
+        /* 补丁回调接口，可以监听补丁接收、下载、合成的回调*/
         Beta.betaPatchListener = betaPatchListenerWapper;
 
 
@@ -207,6 +217,8 @@ public class MyApplication extends Application {
             }
         };*/
 
+        Beta.registerDownloadListener(null);
+
         /**
          * 已经接入Bugly用户改用上面的初始化方法,不影响原有的crash上报功能;
          * init方法会自动检测更新，不需要再手动调用Beta.checkUpdate(),如需增加自动检查时机可以使用Beta.checkUpdate(false,false);
@@ -234,7 +246,15 @@ public class MyApplication extends Application {
     public void onCreate() {
         super.onCreate();
         InitBuglyBeta();
+    }
 
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+        // you must install multiDex whatever tinker is installed!
+        MultiDex.install(base);
 
+        // 安装tinker
+        Beta.installTinker();
     }
 }

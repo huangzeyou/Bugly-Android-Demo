@@ -1,6 +1,7 @@
 package com.bugly.upgrade.demo;
 
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -132,6 +133,8 @@ public class UpgradeActivity extends AppCompatActivity {
             public void onUpgrade(int ret,UpgradeInfo strategy, boolean isManual, boolean isSilence) {
                 if (strategy != null) {
 
+
+
                     /*注册下载监听，监听下载事件*/
                     // 必须在 接收到策略之后再注册 Downloadlistener.
                     Beta.registerDownloadListener(new DownloadListener() {
@@ -181,8 +184,6 @@ public class UpgradeActivity extends AppCompatActivity {
             }
         });
 
-
-
             /*为下载按钮设置监听*/
         start.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -194,10 +195,6 @@ public class UpgradeActivity extends AppCompatActivity {
 //                }
             }
         });
-
-
-
-
 
     }
 
