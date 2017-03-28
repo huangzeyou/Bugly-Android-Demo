@@ -5,7 +5,6 @@ import android.content.pm.ActivityInfo;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
@@ -22,13 +21,21 @@ import com.tencent.bugly.beta.interfaces.BetaPatchListener;
 import com.tencent.bugly.beta.upgrade.UpgradeListener;
 import com.tencent.bugly.beta.upgrade.UpgradeStateListener;
 
-import java.util.Locale;
-import java.util.logging.Logger;
-
-
-
 
 public class UpgradeActivity extends AppCompatActivity {
+    public enum UpgradeType {
+        NONE, UPGRADE, PATCH
+    }
+
+    public UpgradeType getUpgradeType() {
+        return upgradeType;
+    }
+
+    public void setUpgradeType(UpgradeType upgradeType) {
+        this.upgradeType = upgradeType;
+    }
+
+    private UpgradeType upgradeType = UpgradeType.NONE;
 
     private TextView progressTextView;
     private TextView version;
@@ -60,6 +67,8 @@ public class UpgradeActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(),"UPGRADE_SUCCESS",Toast.LENGTH_SHORT).show();
                 progressTextView.setText("检测到有新版本.");
                 updateBtn(Beta.getStrategyTask());
+
+
             }
 
             @Override
@@ -98,12 +107,15 @@ public class UpgradeActivity extends AppCompatActivity {
         app.registBetaPatchListener(new BetaPatchListener() {
             @Override
             public void onPatchReceived(String patchFileUrl) {
+                setUpgradeType(UpgradeType.PATCH);
                 Toast.makeText(getApplicationContext(), patchFileUrl, Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onDownloadReceived(long savedLength, long totalLength) {
-                updateProgress(savedLength, totalLength);
+                if ( getUpgradeType() == UpgradeType.PATCH) {
+                    updateProgress(savedLength, totalLength);
+                }
             }
 
             @Override

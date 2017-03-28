@@ -40,7 +40,7 @@ tinkerSupport {
     baseApkResourceMapping = "${bakPath}/${baseApkDir}/app-debug-R.txt"
 
     // 构建基准包跟补丁包都要修改tinkerId，主要用于区分
-    //tinkerId = "1.1.10-patch1"
+    tinkerId = "1.1.10-patch1"
 
     // 打多渠道补丁时指定目录
 //    buildAllFlavorsDir = "${bakPath}/${baseApkDir}"
