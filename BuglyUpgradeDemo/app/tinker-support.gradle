@@ -5,12 +5,18 @@ def bakPath = file("${buildDir}/bakApk/")
 /**
  * 此处填写每次构建生成的基准包目录
  */
-def baseApkDir = "app-0328-20-44-24"
+def baseApkDir = "app-0329-15-35-34"
 
 /**
  * 对于插件各参数的详细解析请参考
  */
 tinkerSupport {
+
+    // 构建基准包跟补丁包都要修改tinkerId，主要用于区分
+    tinkerId = "1.2.6.6"
+
+    // 自动生成tinker Id
+    //autoGenerateTinkerId = true
 
     // 开启tinker-support插件，默认值true
     enable = true
@@ -18,8 +24,7 @@ tinkerSupport {
     // tinkerEnable功能开关
     tinkerEnable = true
 
-    // 自动生成tinker Id
-    autoGenerateTinkerId = true
+
 
     // 指定归档目录，默认值当前module的子目录tinker
     autoBackupApkDir = "${bakPath}"
@@ -38,9 +43,6 @@ tinkerSupport {
 
     // 对应tinker插件applyResourceMapping
     baseApkResourceMapping = "${bakPath}/${baseApkDir}/app-debug-R.txt"
-
-    // 构建基准包跟补丁包都要修改tinkerId，主要用于区分
-    tinkerId = "1.1.10-patch1"
 
     // 打多渠道补丁时指定目录
 //    buildAllFlavorsDir = "${bakPath}/${baseApkDir}"

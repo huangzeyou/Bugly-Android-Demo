@@ -1,10 +1,13 @@
 package com.bugly.upgrade.demo;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.net.Uri;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
@@ -23,6 +26,11 @@ import com.tencent.bugly.beta.upgrade.UpgradeStateListener;
 
 
 public class UpgradeActivity extends AppCompatActivity {
+
+    private String TAG_PATCH = "TAG_PATCH";
+    private String TAG_UPGRADE = "TAG_UPGRADE";
+
+
     public enum UpgradeType {
         NONE, UPGRADE, PATCH
     }
@@ -66,7 +74,22 @@ public class UpgradeActivity extends AppCompatActivity {
             public void onUpgradeSuccess(boolean isManual) {
                 Toast.makeText(getApplicationContext(),"UPGRADE_SUCCESS",Toast.LENGTH_SHORT).show();
                 progressTextView.setText("检测到有新版本.");
-                updateBtn(Beta.getStrategyTask());
+
+
+                new AlertDialog.Builder(getBaseContext()).setTitle("要继续下载吗？")
+                        .setIcon(android.R.drawable.ic_dialog_info)
+                        .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Beta.startDownload();
+                            }
+                        })
+                        .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                System.exit(0);
+                            }
+                        }).show();
 
 
             }
@@ -75,7 +98,7 @@ public class UpgradeActivity extends AppCompatActivity {
             public void onUpgradeFailed(boolean isManual) {
                 // 检测更新失败
                 Toast.makeText(getApplicationContext(),"UPGRADE_FAILED",Toast.LENGTH_SHORT).show();
-                progressTextView.setText("更新失败.");
+                progressTextView.setText("更新失败....");
             }
 
             @Override
@@ -89,6 +112,7 @@ public class UpgradeActivity extends AppCompatActivity {
             public void onUpgradeNoVersion(boolean isManual) {
                 Toast.makeText(getApplicationContext(),"UPGRADE_NO_VERSION",Toast.LENGTH_SHORT).show();
                 progressTextView.setText("已经是最新版本.");
+//                navigateToGame();
             }
 
             @Override
@@ -104,11 +128,13 @@ public class UpgradeActivity extends AppCompatActivity {
         /**
          * 补丁回调接口，可以监听补丁接收、下载、合成的回调
          */
+
         app.registBetaPatchListener(new BetaPatchListener() {
             @Override
             public void onPatchReceived(String patchFileUrl) {
                 setUpgradeType(UpgradeType.PATCH);
-                Toast.makeText(getApplicationContext(), patchFileUrl, Toast.LENGTH_SHORT).show();
+                progressTextView.setText("检测到有更新补丁包.");
+//                Toast.makeText(getApplicationContext(), patchFileUrl, Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -120,23 +146,48 @@ public class UpgradeActivity extends AppCompatActivity {
 
             @Override
             public void onDownloadSuccess(String patchFilePath) {
-                Toast.makeText(getApplicationContext(), patchFilePath, Toast.LENGTH_SHORT).show();
+//                Toast.makeText(getApplicationContext(), patchFilePath, Toast.LENGTH_SHORT).show();
+                progressTextView.setText("成功下载补丁.");
                 Beta.applyDownloadedPatch();
+
+
             }
 
             @Override
             public void onDownloadFailure(String msg) {
-                Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
+                new AlertDialog.Builder(UpgradeActivity.this).setTitle("补丁下载失败，请检查您的网络")
+                        .setIcon(android.R.drawable.ic_dialog_info)
+                        .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                System.exit(0);
+                            }
+                        }).show();
             }
 
             @Override
             public void onApplySuccess(String msg) {
-                Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
+                progressTextView.setText("补丁应用成功.");
+                try {
+                    Thread.sleep(1 * 1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                navigateToGame();
             }
 
             @Override
             public void onApplyFailure(String msg) {
-                Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
+                Log.e(TAG_PATCH, msg);
+                new AlertDialog.Builder(UpgradeActivity.this).setTitle("补丁失败，请联系客服人员")
+                        .setIcon(android.R.drawable.ic_dialog_info)
+                        .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                System.exit(0);
+                            }
+                        }).show();
             }
         });
 
@@ -151,14 +202,12 @@ public class UpgradeActivity extends AppCompatActivity {
                     Beta.registerDownloadListener(new DownloadListener() {
                         @Override
                         public void onReceive(DownloadTask task) {
-                            updateBtn(task);
                             updateProgress(task);
 
                         }
 
                         @Override
                         public void onCompleted(DownloadTask task) {
-                            updateBtn(task);
                             start.setText("安装");
 
                             start.setOnClickListener(new View.OnClickListener() {
@@ -183,9 +232,7 @@ public class UpgradeActivity extends AppCompatActivity {
 
                         @Override
                         public void onFailed(DownloadTask task, int code, String extMsg) {
-                            updateBtn(task);
                             progressTextView.setText("failed");
-
                         }
                     });
                     Toast.makeText(getApplicationContext(), "有更新 ", Toast.LENGTH_LONG).show();
@@ -196,16 +243,16 @@ public class UpgradeActivity extends AppCompatActivity {
         });
 
             /*为下载按钮设置监听*/
-        start.setOnClickListener(new View.OnClickListener() {
+/*        start.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Beta.startDownload();
-//                updateBtn(task);
-//                if (task.getStatus() == DownloadTask.DOWNLOADING) {
-//                    finish();
-//                }
+                updateBtn(task);
+                if (task.getStatus() == DownloadTask.DOWNLOADING) {
+                    finish();
+                }
             }
-        });
+        });*/
 
     }
 
@@ -280,6 +327,18 @@ public class UpgradeActivity extends AppCompatActivity {
 
         progressTextView.setText(info);
         bar.setProgress( progress );
+    }
+
+
+    private void navigateToGame()
+    {
+        finish();
+
+        Intent i = new Intent();
+        i.setClass(getApplicationContext(), OtherActivity.class);
+        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+        startActivity(i);
     }
 
 
