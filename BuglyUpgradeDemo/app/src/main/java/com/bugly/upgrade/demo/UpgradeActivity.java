@@ -49,7 +49,6 @@ public class UpgradeActivity extends AppCompatActivity {
     private TextView version;
     private TextView content;
 
-    private Button start;
     private ProgressBar bar;
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,7 +62,6 @@ public class UpgradeActivity extends AppCompatActivity {
         progressTextView = getView(R.id.progressTextView);
         version = getView(R.id.version);
         content = getView(R.id.content);
-        start = getView(R.id.start);
         bar = getView(R.id.progressBar);
         bar.setMax(100);
 
@@ -74,22 +72,25 @@ public class UpgradeActivity extends AppCompatActivity {
             public void onUpgradeSuccess(boolean isManual) {
                 Toast.makeText(getApplicationContext(),"UPGRADE_SUCCESS",Toast.LENGTH_SHORT).show();
                 progressTextView.setText("检测到有新版本.");
-
-
-                new AlertDialog.Builder(getBaseContext()).setTitle("要继续下载吗？")
-                        .setIcon(android.R.drawable.ic_dialog_info)
-                        .setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                Beta.startDownload();
-                            }
-                        })
-                        .setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                System.exit(0);
-                            }
-                        }).show();
+                // TODO : 添加网络监测判断
+                if ( true) {
+                    new AlertDialog.Builder(getBaseContext()).setTitle("发现您使用的是移动网络， 要继续下载吗？")
+                            .setIcon(android.R.drawable.ic_dialog_info)
+                            .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    Beta.startDownload();
+                                }
+                            })
+                            .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    System.exit(0);
+                                }
+                            }).show();
+                } else {
+                    Beta.startDownload();
+                }
 
 
             }
@@ -98,7 +99,7 @@ public class UpgradeActivity extends AppCompatActivity {
             public void onUpgradeFailed(boolean isManual) {
                 // 检测更新失败
                 Toast.makeText(getApplicationContext(),"UPGRADE_FAILED",Toast.LENGTH_SHORT).show();
-                progressTextView.setText("更新失败....");
+                progressTextView.setText("更新失败.");
             }
 
             @Override
@@ -112,7 +113,7 @@ public class UpgradeActivity extends AppCompatActivity {
             public void onUpgradeNoVersion(boolean isManual) {
                 Toast.makeText(getApplicationContext(),"UPGRADE_NO_VERSION",Toast.LENGTH_SHORT).show();
                 progressTextView.setText("已经是最新版本.");
-//                navigateToGame();
+                navigateToGame();
             }
 
             @Override
@@ -120,6 +121,39 @@ public class UpgradeActivity extends AppCompatActivity {
             {
                 Toast.makeText(getApplicationContext(),"DOWNLOAD_COMPLETED",Toast.LENGTH_SHORT).show();
                 progressTextView.setText("下载完成.");
+
+            }
+        });
+
+
+        app.registUpgradeListener(new UpgradeListener() {
+            @Override
+            public void onUpgrade(int ret,UpgradeInfo strategy, boolean isManual, boolean isSilence) {
+                if (strategy != null) {
+
+                    /*注册下载监听，监听下载事件*/
+                    // 必须在 接收到策略之后再注册 Downloadlistener.
+                    Beta.registerDownloadListener(new DownloadListener() {
+                        @Override
+                        public void onReceive(DownloadTask task) {
+                            updateProgress(task);
+
+                        }
+
+                        @Override
+                        public void onCompleted(DownloadTask task) {
+                            progressTextView.setText("成功下载补丁.");
+                        }
+
+                        @Override
+                        public void onFailed(DownloadTask task, int code, String extMsg) {
+                            AlertDownloadFail();
+                        }
+                    });
+
+                } else {
+                    Toast.makeText(getApplicationContext(), "没有更新", Toast.LENGTH_LONG).show();
+                }
             }
         });
 
@@ -155,14 +189,7 @@ public class UpgradeActivity extends AppCompatActivity {
 
             @Override
             public void onDownloadFailure(String msg) {
-                new AlertDialog.Builder(UpgradeActivity.this).setTitle("补丁下载失败，请检查您的网络")
-                        .setIcon(android.R.drawable.ic_dialog_info)
-                        .setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                System.exit(0);
-                            }
-                        }).show();
+                AlertDownloadFail();
             }
 
             @Override
@@ -190,70 +217,6 @@ public class UpgradeActivity extends AppCompatActivity {
                         }).show();
             }
         });
-
-
-        app.registUpgradeListener(new UpgradeListener() {
-            @Override
-            public void onUpgrade(int ret,UpgradeInfo strategy, boolean isManual, boolean isSilence) {
-                if (strategy != null) {
-
-                    /*注册下载监听，监听下载事件*/
-                    // 必须在 接收到策略之后再注册 Downloadlistener.
-                    Beta.registerDownloadListener(new DownloadListener() {
-                        @Override
-                        public void onReceive(DownloadTask task) {
-                            updateProgress(task);
-
-                        }
-
-                        @Override
-                        public void onCompleted(DownloadTask task) {
-                            start.setText("安装");
-
-                            start.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-
-                                    DownloadTask task = Beta.getStrategyTask();
-
-                                    Intent i = new Intent(Intent.ACTION_VIEW);
-                                    i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-                                    i.setDataAndType(Uri.parse("file://" + task.getSaveFile().getAbsolutePath()),
-                                            "application/vnd.android.package-archive");
-                                    getApplicationContext().startActivity(i);
-
-                                    android.os.Process.killProcess(android.os.Process.myPid());
-
-                                }
-                            });
-
-                        }
-
-                        @Override
-                        public void onFailed(DownloadTask task, int code, String extMsg) {
-                            progressTextView.setText("failed");
-                        }
-                    });
-                    Toast.makeText(getApplicationContext(), "有更新 ", Toast.LENGTH_LONG).show();
-                } else {
-                    Toast.makeText(getApplicationContext(), "没有更新", Toast.LENGTH_LONG).show();
-                }
-            }
-        });
-
-            /*为下载按钮设置监听*/
-/*        start.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Beta.startDownload();
-                updateBtn(task);
-                if (task.getStatus() == DownloadTask.DOWNLOADING) {
-                    finish();
-                }
-            }
-        });*/
-
     }
 
     @Override
@@ -280,31 +243,6 @@ public class UpgradeActivity extends AppCompatActivity {
 
     }
 
-
-    public void updateBtn(DownloadTask task) {
-        int status = task.getStatus();
-            /*根据下载任务状态设置按钮*/
-        switch (status) {
-            case DownloadTask.INIT:
-            case DownloadTask.DELETED:
-            case DownloadTask.FAILED: {
-                start.setText("开始下载");
-            }
-            break;
-            case DownloadTask.COMPLETE: {
-                start.setText("安装");
-            }
-            break;
-            case DownloadTask.DOWNLOADING: {
-                start.setText("暂停");
-            }
-            break;
-            case DownloadTask.PAUSED: {
-                start.setText("继续下载");
-            }
-            break;
-        }
-    }
 
     public void updateProgress(DownloadTask task)
     {
@@ -341,6 +279,17 @@ public class UpgradeActivity extends AppCompatActivity {
         startActivity(i);
     }
 
+    private void AlertDownloadFail()
+    {
+        new AlertDialog.Builder(UpgradeActivity.this).setTitle("补丁下载失败，请检查您的网络")
+                .setIcon(android.R.drawable.ic_dialog_info)
+                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        System.exit(0);
+                    }
+                }).show();
+    }
 
     public <T extends View> T getView(int id) {
         return (T) findViewById(id);
