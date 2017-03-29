@@ -3,19 +3,20 @@ package com.bugly.upgrade.demo;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
-import android.net.Uri;
+
+import android.net.NetworkInfo;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.view.Window;
-import android.widget.Button;
+
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 
+import com.bugly.upgrade.tool.NetStateUtils;
 import com.tencent.bugly.beta.Beta;
 import com.tencent.bugly.beta.UpgradeInfo;
 import com.tencent.bugly.beta.download.DownloadTask;
@@ -23,6 +24,9 @@ import com.tencent.bugly.beta.download.DownloadListener;
 import com.tencent.bugly.beta.interfaces.BetaPatchListener;
 import com.tencent.bugly.beta.upgrade.UpgradeListener;
 import com.tencent.bugly.beta.upgrade.UpgradeStateListener;
+
+
+
 
 
 public class UpgradeActivity extends AppCompatActivity {
@@ -46,24 +50,22 @@ public class UpgradeActivity extends AppCompatActivity {
     private UpgradeType upgradeType = UpgradeType.NONE;
 
     private TextView progressTextView;
-    private TextView version;
-    private TextView content;
 
     private ProgressBar bar;
 
     protected void onCreate(Bundle savedInstanceState) {
 
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_upgrade);
 
         progressTextView = getView(R.id.progressTextView);
-        version = getView(R.id.version);
-        content = getView(R.id.content);
         bar = getView(R.id.progressBar);
         bar.setMax(100);
+
+
+        progressTextView.setText("正在检测更新.");
 
         /* 设置更新状态回调接口 */
         MyApplication app = (MyApplication)getApplication();
@@ -72,9 +74,9 @@ public class UpgradeActivity extends AppCompatActivity {
             public void onUpgradeSuccess(boolean isManual) {
                 Toast.makeText(getApplicationContext(),"UPGRADE_SUCCESS",Toast.LENGTH_SHORT).show();
                 progressTextView.setText("检测到有新版本.");
-                // TODO : 添加网络监测判断
-                if ( true) {
-                    new AlertDialog.Builder(getBaseContext()).setTitle("发现您使用的是移动网络， 要继续下载吗？")
+
+                if ( !NetStateUtils.isWifi(getApplicationContext())) {
+                    new AlertDialog.Builder(UpgradeActivity.this).setTitle("发现您使用的网络并非wifi， 要继续下载吗？")
                             .setIcon(android.R.drawable.ic_dialog_info)
                             .setPositiveButton("确定", new DialogInterface.OnClickListener() {
                                 @Override
@@ -106,7 +108,7 @@ public class UpgradeActivity extends AppCompatActivity {
             public void onUpgrading(boolean isManual) {
                 // 正在检测更新
                 Toast.makeText(getApplicationContext(),"UPGRADE_CHECKING",Toast.LENGTH_SHORT).show();
-                progressTextView.setText("正在检测更新.");
+                progressTextView.setText("正在检测更新.......");
             }
 
             @Override
@@ -130,7 +132,7 @@ public class UpgradeActivity extends AppCompatActivity {
             @Override
             public void onUpgrade(int ret,UpgradeInfo strategy, boolean isManual, boolean isSilence) {
                 if (strategy != null) {
-
+                    setUpgradeType( UpgradeType.UPGRADE);
                     /*注册下载监听，监听下载事件*/
                     // 必须在 接收到策略之后再注册 Downloadlistener.
                     Beta.registerDownloadListener(new DownloadListener() {
@@ -152,7 +154,7 @@ public class UpgradeActivity extends AppCompatActivity {
                     });
 
                 } else {
-                    Toast.makeText(getApplicationContext(), "没有更新", Toast.LENGTH_LONG).show();
+//                    Toast.makeText(getApplicationContext(), "没有更新", Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -207,7 +209,7 @@ public class UpgradeActivity extends AppCompatActivity {
             @Override
             public void onApplyFailure(String msg) {
                 Log.e(TAG_PATCH, msg);
-                new AlertDialog.Builder(UpgradeActivity.this).setTitle("补丁失败，请联系客服人员")
+                new AlertDialog.Builder(UpgradeActivity.this).setTitle("打补丁失败，请联系客服人员")
                         .setIcon(android.R.drawable.ic_dialog_info)
                         .setPositiveButton("确定", new DialogInterface.OnClickListener() {
                             @Override
@@ -244,7 +246,7 @@ public class UpgradeActivity extends AppCompatActivity {
     }
 
 
-    public void updateProgress(DownloadTask task)
+    private void updateProgress(DownloadTask task)
     {
         progressTextView.setVisibility(View.VISIBLE);
         bar.setVisibility(View.VISIBLE);
@@ -295,3 +297,6 @@ public class UpgradeActivity extends AppCompatActivity {
         return (T) findViewById(id);
     }
 }
+
+
+
