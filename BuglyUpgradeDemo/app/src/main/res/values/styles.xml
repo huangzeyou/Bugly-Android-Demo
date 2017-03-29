@@ -7,5 +7,11 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
-
+    <style name="data_downloader_progreeBar" parent="android:Widget.ProgressBar.Horizontal">
+        <item name="android:progressDrawable">@drawable/data_downloader_progressbar</item>
+        <item name="android:layout_width">@dimen/data_downloader_horizontal_progessbar_width</item>
+        <item name="android:layout_height">@dimen/data_downloader_horizontal_progessbar_height</item>
+        <item name="android:indeterminate">false</item>
+        <item name="android:layout_gravity">bottom|center_horizontal</item>
+    </style>
 </resources>

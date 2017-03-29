@@ -72,7 +72,6 @@ public class UpgradeActivity extends AppCompatActivity {
         app.registUpgradeStateListener(new UpgradeStateListener() {
             @Override
             public void onUpgradeSuccess(boolean isManual) {
-                Toast.makeText(getApplicationContext(),"UPGRADE_SUCCESS",Toast.LENGTH_SHORT).show();
                 progressTextView.setText("检测到有新版本.");
 
                 if ( !NetStateUtils.isWifi(getApplicationContext())) {
@@ -100,20 +99,20 @@ public class UpgradeActivity extends AppCompatActivity {
             @Override
             public void onUpgradeFailed(boolean isManual) {
                 // 检测更新失败
-                Toast.makeText(getApplicationContext(),"UPGRADE_FAILED",Toast.LENGTH_SHORT).show();
-                progressTextView.setText("更新失败.");
+                //Toast.makeText(getApplicationContext(),"UPGRADE_FAILED",Toast.LENGTH_SHORT).show();
+                progressTextView.setText("检测更新更新失败.");
             }
 
             @Override
             public void onUpgrading(boolean isManual) {
                 // 正在检测更新
-                Toast.makeText(getApplicationContext(),"UPGRADE_CHECKING",Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getApplicationContext(),"UPGRADE_CHECKING",Toast.LENGTH_SHORT).show();
                 progressTextView.setText("正在检测更新.......");
             }
 
             @Override
             public void onUpgradeNoVersion(boolean isManual) {
-                Toast.makeText(getApplicationContext(),"UPGRADE_NO_VERSION",Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getApplicationContext(),"UPGRADE_NO_VERSION",Toast.LENGTH_SHORT).show();
                 progressTextView.setText("已经是最新版本.");
                 navigateToGame();
             }
@@ -121,7 +120,7 @@ public class UpgradeActivity extends AppCompatActivity {
             @Override
             public void onDownloadCompleted(boolean isManual)
             {
-                Toast.makeText(getApplicationContext(),"DOWNLOAD_COMPLETED",Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getApplicationContext(),"DOWNLOAD_COMPLETED",Toast.LENGTH_SHORT).show();
                 progressTextView.setText("下载完成.");
 
             }
@@ -144,7 +143,7 @@ public class UpgradeActivity extends AppCompatActivity {
 
                         @Override
                         public void onCompleted(DownloadTask task) {
-                            progressTextView.setText("成功下载补丁.");
+                            progressTextView.setText("成功下载新版本.");
                         }
 
                         @Override

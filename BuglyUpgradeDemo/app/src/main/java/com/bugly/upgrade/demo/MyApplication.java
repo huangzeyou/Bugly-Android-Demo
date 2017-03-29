@@ -122,7 +122,7 @@ public class MyApplication extends Application {
          * 只允许在MainActivity上显示更新弹窗，其他activity上不显示弹窗;
          * 不设置会默认所有activity都可以显示弹窗;
          */
-        Beta.canShowUpgradeActs.add(MainActivity.class);
+        Beta.canShowUpgradeActs.add(OtherActivity.class);
 
 
         /* 设置更新状态回调接口 */
