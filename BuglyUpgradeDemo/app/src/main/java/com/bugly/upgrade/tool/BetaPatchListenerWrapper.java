@@ -6,7 +6,7 @@ import android.util.Log;
  * Created by zill on 2017/3/27.
  */
 
-public class BetaPatchListenerWapper implements BetaPatchListener {
+public class BetaPatchListenerWrapper implements BetaPatchListener {
     BetaPatchListener listener = null;
     private static String TAG = "Bugly";
 

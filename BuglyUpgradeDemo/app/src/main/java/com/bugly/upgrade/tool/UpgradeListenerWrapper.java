@@ -9,7 +9,7 @@ import android.util.Log;
  * Created by zill on 2017/3/27.
  */
 
-public class UpgradeListenerWapper implements UpgradeListener
+public class UpgradeListenerWrapper implements UpgradeListener
 {
     private UpgradeListener listener = null;
     private static String TAG = "Bugly";
