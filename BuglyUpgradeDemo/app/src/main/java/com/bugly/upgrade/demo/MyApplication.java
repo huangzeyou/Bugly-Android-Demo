@@ -5,14 +5,12 @@ import android.content.Context;
 import android.os.Environment;
 import android.support.multidex.MultiDex;
 
-import com.bugly.upgrade.tool.BetaPatchListenerWapper;
+import com.bugly.upgrade.tool.BetaPatchListenerWrapper;
 import com.bugly.upgrade.tool.UpgradeStateListenerWrapper;
-import com.bugly.upgrade.tool.UpgradeListenerWapper;
+import com.bugly.upgrade.tool.UpgradeListenerWrapper;
 
 import com.tencent.bugly.Bugly;
 import com.tencent.bugly.beta.Beta;
-
-import com.tencent.bugly.beta.ui.UILifecycleListener;
 
 import com.tencent.bugly.beta.upgrade.UpgradeStateListener;
 import com.tencent.bugly.beta.upgrade.UpgradeListener;
@@ -31,8 +29,8 @@ public class MyApplication extends Application {
     private static final String TAG = "OnUILifecycleListener";
 
     private UpgradeStateListenerWrapper upgradeStateListenerWrapper = new UpgradeStateListenerWrapper();
-    private UpgradeListenerWapper upgradeListenerWapper = new UpgradeListenerWapper();
-    private BetaPatchListenerWapper betaPatchListenerWapper = new BetaPatchListenerWapper();
+    private UpgradeListenerWrapper upgradeListenerWrapper = new UpgradeListenerWrapper();
+    private BetaPatchListenerWrapper betaPatchListenerWrapper = new BetaPatchListenerWrapper();
 
 
     public void registUpgradeStateListener(UpgradeStateListener l) {
@@ -43,17 +41,17 @@ public class MyApplication extends Application {
     }
 
     public void registUpgradeListener(UpgradeListener l) {
-        upgradeListenerWapper.regist(l);
+        upgradeListenerWrapper.regist(l);
     }
     public void unregistUpgradeListener() {
-        upgradeListenerWapper.unregist();
+        upgradeListenerWrapper.unregist();
     }
 
     public void registBetaPatchListener(BetaPatchListener l) {
-        betaPatchListenerWapper.regist(l);
+        betaPatchListenerWrapper.regist(l);
     }
     public void unregistBetaPatchListener() {
-        betaPatchListenerWapper.unregist();
+        betaPatchListenerWrapper.unregist();
     }
 
     private void InitBuglyBeta()
@@ -128,11 +126,11 @@ public class MyApplication extends Application {
         Beta.upgradeStateListener = upgradeStateListenerWrapper;
 
         /*在application中初始化时设置监听，监听策略的收取*/
-        Beta.upgradeListener = upgradeListenerWapper;
+        Beta.upgradeListener = upgradeListenerWrapper;
 
 
         /* 补丁回调接口，可以监听补丁接收、下载、合成的回调*/
-        Beta.betaPatchListener = betaPatchListenerWapper;
+        Beta.betaPatchListener = betaPatchListenerWrapper;
 
 
         /**
