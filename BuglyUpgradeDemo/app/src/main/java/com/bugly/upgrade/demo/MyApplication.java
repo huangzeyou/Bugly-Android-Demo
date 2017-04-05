@@ -4,7 +4,6 @@ import android.app.Application;
 import android.content.Context;
 import android.os.Environment;
 import android.support.multidex.MultiDex;
-import android.widget.Toast;
 
 import com.bugly.upgrade.tool.BetaPatchListenerWapper;
 import com.bugly.upgrade.tool.UpgradeStateListenerWrapper;
@@ -27,7 +26,7 @@ import com.tencent.bugly.beta.interfaces.BetaPatchListener;
 public class MyApplication extends Application {
 
 
-    public static final String APP_ID = "91cb66a058"; // TODO 替换成bugly上注册的appid
+    public static final String APP_ID = "7980d21839"; // TODO 替换成bugly上注册的appid
     public static final String APP_CHANNEL = "DEBUG"; // TODO 自定义渠道
     private static final String TAG = "OnUILifecycleListener";
 
